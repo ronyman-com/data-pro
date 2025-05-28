@@ -3,6 +3,7 @@ from django.urls import path, include
 from data_pro.admin.home import *
 from django.views.generic import RedirectView
 from data_pro.admin.views import DashboardView
+from django.conf.urls.static import static
 from data_pro.admin.views import *
 from data_pro.views import *
 
@@ -22,4 +23,4 @@ urlpatterns = [
     path('api/', include('data_pro.api.urls')),
     path('auth/', include('django.contrib.auth.urls')),
     
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -120,8 +120,22 @@ LOGOUT_REDIRECT_URL = 'home'  # Where to redirect after logout
 
 
 AUTH_USER_MODEL = 'data_pro.User'
-LOGIN_URL = '/auth/login/'  # Or your custom login URL
+# Authentication
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/system-admin/'
+LOGOUT_REDIRECT_URL = '/auth/login/'
 
+
+# settings.py
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 5  # Lock after 5 attempts
+AXES_COOLOFF_TIME = 1  # 1 hour lock
+AXES_LOCKOUT_TEMPLATE = 'lockout.html'
+
+# settings.py
+SESSION_COOKIE_AGE = 3600  # 1 hour session
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 # Password validation

@@ -1,6 +1,6 @@
 {% extends "admin/base_simple.html" %}
 
-{% block title %}Data-Pro Admin | Logged Out{% endblock %}
+{% block title %}Logged Out | Data-Pro Admin{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-5">
@@ -25,11 +25,4 @@
         </div>
     </div>
 </div>
-
-<script>
-// Auto-redirect after 5 seconds
-setTimeout(function() {
-    window.location.href = "{% url 'login' %}";
-}, 5000);
-</script>
 {% endblock %}

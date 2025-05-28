@@ -1,27 +1,4 @@
-  <!-- Agency admn base -->
-{% extends "admin/base.html" %}
-
-{% block extrahead %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4b38b3;
-            --secondary: #6c757d;
-        }
-        body {
-            background-color: #f8fafc;
-        }
-        #header {
-            background: var(--primary);
-            color: white;
-        }
-        .module h2, .module caption, .inline-group h2 {
-            background: var(--primary);
-        }
-    </style>
-{% endblock %}
-
+<!-- templates/admin/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,19 +20,24 @@
         .sidebar {
             min-height: 100vh;
         }
+        :root {
+            --primary: #4b38b3;
+            --secondary: #6c757d;
+        }
+        body {
+            background-color: #f8fafc;
+        }
+        #header {
+            background: var(--primary);
+            color: white;
+        }
+        .module h2, .module caption, .inline-group h2 {
+            background: var(--primary);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-
-    <!-- Add to templates/admin/base.html -->
-{% if request.user.user_type == 'SUPERADMIN' %}
-<li class="nav-item">
-    <a href="{% url 'system:superadmin-panel' %}" class="nav-link">
-        <i class="bi bi-shield-lock"></i> SuperAdmin
-    </a>
-</li>
-{% endif %}
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -64,45 +46,56 @@
                     <h4 class="text-white px-3">Data-Pro Admin</h4>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:dashboard' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:dashboard' %}">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:customer-list' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:customer-list' %}">
                                 <i class="bi bi-people"></i> Customers
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:visa-list' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:visa-list' %}">
                                 <i class="bi bi-passport"></i> Visas
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:passport-list' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:passport-list' %}">
                                 <i class="bi bi-file-earmark-text"></i> Passports
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:vehicle-list' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:vehicle-list' %}">
                                 <i class="bi bi-truck"></i> Vehicles
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:transport-list' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:transport-list' %}">
                                 <i class="bi bi-geo-alt"></i> Transports
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'system:invoice-list' %}">
+                            <a class="nav-link text-white" href="{% url 'data_pro:invoice-list' %}">
                                 <i class="bi bi-receipt"></i> Invoices
                             </a>
                         </li>
+                        
+                        {% if request.user.is_authenticated and request.user.user_type == 'SUPERADMIN' %}
+                        <li class="nav-item">
+                            <a href="{% url 'data_pro:superadmin-panel' %}" class="nav-link text-white">
+                                <i class="bi bi-shield-lock"></i> SuperAdmin
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% if request.user.is_authenticated %}
                         <li class="nav-item mt-4">
                             <a class="nav-link text-white" href="{% url 'logout' %}">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
