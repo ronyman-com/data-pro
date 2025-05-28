@@ -2,6 +2,12 @@ from django.urls import path
 from django.contrib.auth.decorators import login_required
 from data_pro.admin.views import *
 from data_pro.views import *
+from data_pro.admin.client import (
+    ClientListView, 
+    ClientCreateView, 
+    ClientUpdateView, 
+    ClientDeleteView
+)
 
 app_name = 'data_pro'  # This matches the namespace
 
@@ -9,7 +15,6 @@ urlpatterns = [
     # Admin dashboard
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('auth/login/', CustomLoginView.as_view(), name='login'),
-    path('superadmin/', SuperAdminPanelView.as_view(), name='superadmin-panel'),
     
     # Customer management
     path('customers/', CustomerListView.as_view(), name='customer-list'),
@@ -56,8 +61,14 @@ urlpatterns = [
     path('invoices/<int:pk>/update/', InvoiceUpdateView.as_view(), name='invoice-update'),
     path('invoices/<int:pk>/status/', InvoiceStatusView.as_view(), name='invoice-status'),
     path('invoices/<int:pk>/delete/', InvoiceDeleteView.as_view(), name='invoice-delete'),
+    
 
-  
+     # Client Management
+    path('clients/', ClientListView.as_view(), name='client-list'),
+    path('clients/create/', ClientCreateView.as_view(), name='client-create'),
+    path('clients/<int:pk>/edit/', ClientUpdateView.as_view(), name='client-edit'),
+    path('clients/<int:pk>/delete/', ClientDeleteView.as_view(), name='client-delete'),
+
    
 
 

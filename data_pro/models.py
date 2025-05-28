@@ -6,6 +6,7 @@ class User(AbstractUser):
     USER_TYPE_CHOICES = (
         ('SUPERADMIN', 'Super Admin'),
         ('CLIENT_ADMIN', 'Client Admin'),
+        ('STAFF', 'Staff'),
         ('CUSTOMER', 'Customer'),
     )
     
@@ -14,6 +15,13 @@ class User(AbstractUser):
     client = models.ForeignKey('Client', on_delete=models.CASCADE, null=True, blank=True)
     phone = models.CharField(max_length=20)
     is_visible = models.BooleanField(default=True)
+
+    
+    def is_superadmin(self):
+        return self.user_type == 'SUPERADMIN' or self.is_superuser
+    
+    def is_client_admin(self):
+        return self.user_type == 'CLIENT_ADMIN'
     
     # Fix for group/permission conflicts
     groups = models.ManyToManyField(
@@ -41,7 +49,16 @@ class Client(models.Model):
     address = models.TextField()
     contact_email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
+    
+
+    
+
+
+
+    
+    

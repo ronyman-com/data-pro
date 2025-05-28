@@ -31,6 +31,28 @@ def permission_denied_view(request, exception):
 
 
 # ====================== ADMIN VIEWS ======================
+# data_pro/admin/views.py
+class ClientUserListView(SuperAdminMixin, ListView):
+    model = User
+    template_name = 'admin/users/client_list.html'
+    
+    def get_queryset(self):
+        return User.objects.filter(user_type='CLIENT_ADMIN')
+
+class ClientUserCreateView(SuperAdminMixin, CreateView):
+    model = User
+    fields = ['username', 'email', 'password', 'user_type', 'client']
+    template_name = 'admin/users/client_form.html'
+    success_url = reverse_lazy('system:client-user-list')
+    
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data['password'])
+        user.user_type = 'CLIENT_ADMIN'
+        user.save()
+        return super().form_valid(form)
+    
+
 class UserListView(SuperAdminMixin, ListView):
     template_name = 'admin/users/list.html'
     model = User
@@ -44,6 +66,15 @@ class SuperAdminPanelView(SuperAdminMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add superadmin management data
+        return context
+    
+# data_pro/admin/views.py
+class SystemSettingsView(SuperAdminMixin, TemplateView):
+    template_name = 'admin/system_settings.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add any system settings context data here
         return context
 
 class DashboardView(ClientAdminMixin, TemplateView):

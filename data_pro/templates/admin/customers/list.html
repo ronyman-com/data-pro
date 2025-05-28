@@ -5,13 +5,13 @@
 
 {% block header_buttons %}
     <div class="btn-group me-2">
-        <a href="{% url 'customer-create' %}" class="btn btn-sm btn-primary">
+        <a href="{% url 'system:customer-create' %}" class="btn btn-sm btn-primary">
             <i class="bi bi-plus-circle"></i> Add Customer
         </a>
-        <a href="{% url 'customer-import' %}" class="btn btn-sm btn-success" id="import-btn">
+        <a href="{% url 'system:customer-import' %}" class="btn btn-sm btn-success" id="import-btn">
             <i class="bi bi-upload"></i> Import
         </a>
-        <a href="{% url 'customer-export' %}" class="btn btn-sm btn-secondary">
+        <a href="{% url 'system:customer-export' %}" class="btn btn-sm btn-secondary">
             <i class="bi bi-download"></i> Export
         </a>
     </div>
@@ -43,10 +43,10 @@
                 <td>{{ customer.nationality }}</td>
                 <td>{{ customer.created_at|date:"Y-m-d" }}</td>
                 <td>
-                    <a href="{% url 'customer-edit' customer.pk %}" class="btn btn-sm btn-warning">
+                    <a href="{% url 'system:customer-edit' customer.pk %}" class="btn btn-sm btn-warning">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="{% url 'customer-detail' customer.pk %}" class="btn btn-sm btn-info">
+                    <a href="{% url 'system:customer-detail' customer.pk %}" class="btn btn-sm btn-info">
                         <i class="bi bi-eye"></i>
                     </a>
                 </td>
@@ -60,7 +60,7 @@
 <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{% url 'customer-import' %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'system:customer-import' %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h5 class="modal-title">Import Customers</h5>
@@ -72,7 +72,7 @@
                         <input class="form-control" type="file" id="excelFile" name="excel_file" accept=".xlsx, .xls" required>
                     </div>
                     <div class="alert alert-info">
-                        <small>Download the <a href="{% url 'customer-export' %}">template file</a> for reference.</small>
+                        <small>Download the <a href="{% url 'system:customer-export' %}">template file</a> for reference.</small>
                     </div>
                 </div>
                 <div class="modal-footer">

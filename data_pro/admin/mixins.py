@@ -32,6 +32,7 @@ class SuperAdminMixin(BaseAccessMixin):
     
     def get_denied_message(self):
         return "Superadmin access required"
+    
 
 class ClientAdminMixin(BaseAccessMixin):
     """Allows both superusers and client admins"""
