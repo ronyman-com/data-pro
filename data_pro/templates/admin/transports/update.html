@@ -1,0 +1,138 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Update Transport | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-truck"></i> Update Transport #{{ object.id }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:transport-list' %}">Transports</a></li>
+                    <li class="breadcrumb-item active">Update</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer</label>
+                                <p class="form-control-plaintext">{{ object.customer }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_vehicle" class="form-label">Vehicle</label>
+                                {{ form.vehicle }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_pickup_location" class="form-label">Pickup Location</label>
+                                {{ form.pickup_location }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_dropoff_location" class="form-label">Dropoff Location</label>
+                                {{ form.dropoff_location }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_pickup_time" class="form-label">Pickup Date & Time</label>
+                                {{ form.pickup_time }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_dropoff_time" class="form-label">Dropoff Time</label>
+                                {{ form.dropoff_time }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_price" class="form-label">Price (USD)</label>
+                                {{ form.price }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch mt-2">
+                                    {{ form.is_completed }}
+                                    <label class="form-check-label" for="id_is_completed">
+                                        Mark as completed
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_notes" class="form-label">Driver Notes</label>
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:transport-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Transport</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-clock-history"></i> Transport History
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Created:</strong> {{ object.created_at|date:"M d, Y H:i" }}</li>
+                        <li class="mb-2"><strong>Last Updated:</strong> {{ object.updated_at|date:"M d, Y H:i" }}</li>
+                        <li class="mb-2"><strong>Created By:</strong> {{ object.created_by }}</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-exclamation-triangle"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'system:transport-status' object.pk %}" class="btn btn-outline-info btn-sm mb-2">
+                        <i class="bi bi-gear"></i> Change Status
+                    </a>
+                    <a href="{% url 'system:transport-delete' object.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize datetime pickers
+    $('#id_pickup_time').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm',
+        sideBySide: true
+    });
+    $('#id_dropoff_time').datetimepicker({
+        format: 'HH:mm',
+        stepping: 15
+    });
+});
+</script>
+{% endblock %}

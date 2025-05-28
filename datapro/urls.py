@@ -1,16 +1,20 @@
-"""
-URL configuration for datapro project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-"""
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth.decorators import login_required
-from data_pro.admin.views import *
+from data_pro.admin.home import *
+from django.views.generic import RedirectView
+from data_pro.admin.views import DashboardView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('/', include('data_pro.urls')),
-    # path('passport/', include('datapro.passport.urls')),
+    path('system-admin/', admin.site.urls),
+    path('', SystemLandingView.as_view(), name='home'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    
+    # Redirect /system/ to /system/dashboard/
+    #path('system/', RedirectView.as_view(url='dashboard/', permanent=True)),
+    
+    # Include your app URLs with namespace
+    path('system/', include(('data_pro.urls'), namespace='system')),
+    
+    path('api/', include('data_pro.api.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
 ]

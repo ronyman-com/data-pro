@@ -1,0 +1,133 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Data-Pro System | Home{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-speedometer2"></i> System Overview
+            </h2>
+            <div class="alert alert-primary">
+                Welcome back, {{ request.user.get_full_name }}! Here's what's happening today.
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-people"></i> Customers
+                    </h5>
+                    <h2 class="display-4">{{ total_customers }}</h2>
+                    <a href="{% url 'system:customer-list' %}" class="text-white">View All</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-passport"></i> Active Visas
+                    </h5>
+                    <h2 class="display-4">{{ active_visas }}</h2>
+                    <a href="{% url 'system:visa-list' %}" class="text-white">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-file-earmark-text"></i> Pending Passports
+                    </h5>
+                    <h2 class="display-4">{{ pending_passports }}</h2>
+                    <a href="{% url 'system:passport-list' %}" class="text-dark">Process</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                         <!-- Quick Actions -->
+                        {% for action in quick_actions %}
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url action.url %}" class="btn btn-outline-primary w-100">
+                                <i class="{{ action.icon }}"></i> {{ action.name }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Recent Invoices
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for invoice in recent_invoices %}
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">#{{ invoice.invoice_number }}</h6>
+                                <small>${{ invoice.total_amount }}</small>
+                            </div>
+                            <small>{{ invoice.customer }} - {{ invoice.issue_date|date:"M d, Y" }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-check"></i> System Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="alert alert-success">
+                                <i class="bi bi-truck"></i> {{ available_vehicles }} Vehicles Available
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="alert alert-info">
+                                <i class="bi bi-geo-alt"></i> {{ scheduled_transports }} Transports Scheduled
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

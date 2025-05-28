@@ -1,0 +1,69 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Vehicles - Data-Pro Admin{% endblock %}
+{% block page_title %}Vehicle Management{% endblock %}
+
+{% block header_buttons %}
+    <div class="btn-group me-2">
+        <a href="#" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Vehicle
+        </a>
+        <a href="#" class="btn btn-sm btn-success" id="import-btn">
+            <i class="bi bi-upload"></i> Import
+        </a>
+        <a href="#" class="btn btn-sm btn-secondary" id="export-btn">
+            <i class="bi bi-download"></i> Export
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table id="vehicles-table" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Reg. No.</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vehicle in vehicles %}
+            <tr>
+                <td>{{ vehicle.registration_number }}</td>
+                <td>{{ vehicle.get_vehicle_type_display }}</td>
+                <td>{{ vehicle.capacity }}</td>
+                <td>
+                    <span class="badge bg-{% if vehicle.is_available %}success{% else %}danger{% endif %}">
+                        {% if vehicle.is_available %}Available{% else %}In Use{% endif %}
+                    </span>
+                </td>
+                <td>{{ vehicle.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#vehicles-table').DataTable({
+        responsive: true,
+        order: [[4, 'desc']]
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

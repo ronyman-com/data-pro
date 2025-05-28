@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'data_pro',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -55,17 +59,41 @@ ROOT_URLCONF = 'datapro.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'data_pro/templates'),  # Your custom templates
+            os.path.join(BASE_DIR, 'templates'),           # Project-wide templates
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'data_pro.context_processors.user_type',
             ],
         },
     },
 ]
+
+
+# Create data_pro/context_processors.py
+def user_type(request):
+    return {
+        'is_superadmin': request.user.is_authenticated and request.user.user_type == 'SUPERADMIN',
+        'is_client_admin': request.user.is_authenticated and request.user.user_type == 'CLIENT_ADMIN',
+    }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
+}
 
 WSGI_APPLICATION = 'datapro.wsgi.application'
 
@@ -79,6 +107,21 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+handler403 = 'data_pro.views.permission_denied_view'
+
+# Add these settings if missing
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+LOGIN_REDIRECT_URL = 'system:dashboard'  # Where to redirect after login
+LOGOUT_REDIRECT_URL = 'home'  # Where to redirect after logout
+
+
+AUTH_USER_MODEL = 'data_pro.User'
+LOGIN_URL = '/auth/login/'  # Or your custom login URL
+
 
 
 # Password validation
@@ -104,18 +147,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

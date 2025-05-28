@@ -1,5 +1,5 @@
 from django.db import models
-from data_pro.accounts.models import User
+from data_pro.models import User
 
 
 class TrackedModel(models.Model):

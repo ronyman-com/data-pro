@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Update Transport Status | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-truck"></i> Update Status for Transport #{{ object.id }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:transport-list' %}">Transports</a></li>
+                    <li class="breadcrumb-item active">Status</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-clipboard-check"></i> Transport Status
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Current Status</label>
+                            <p class="form-control-plaintext">
+                                {% if object.is_completed %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_status" class="form-label">New Status</label>
+                            {{ form.status }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_driver_notes" class="form-label">Driver Notes</label>
+                            {{ form.driver_notes }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_actual_dropoff_time" class="form-label">Actual Dropoff Time</label>
+                            {{ form.actual_dropoff_time }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:transport-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize time picker
+    $('#id_actual_dropoff_time').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm',
+        sideBySide: true
+    });
+});
+</script>
+{% endblock %}

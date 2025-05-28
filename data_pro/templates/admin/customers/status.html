@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Update Customer Status | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-person-gear"></i> Update Status for {{ object.get_full_name }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:customer-list' %}">Customers</a></li>
+                    <li class="breadcrumb-item active">Status</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-person-check"></i> Customer Status
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Current Status</label>
+                            <p class="form-control-plaintext">
+                                {% if object.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_is_active" class="form-label">New Status</label>
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="id_is_active">
+                                    {% if object.is_active %}
+                                        Deactivate this customer
+                                    {% else %}
+                                        Activate this customer
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_status_notes" class="form-label">Status Notes</label>
+                            {{ form.status_notes }}
+                            <small class="form-text text-muted">Explain reason for status change</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:customer-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

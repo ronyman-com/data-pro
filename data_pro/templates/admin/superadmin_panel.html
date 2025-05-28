@@ -1,0 +1,49 @@
+<!-- templates/admin/superadmin_panel.html -->
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>SuperAdmin Control Panel</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    User Management
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'system:user-list' %}" class="btn btn-primary">
+                        Manage All Users
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    System Settings
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'system:system-settings' %}" class="btn btn-primary">
+                        Configure System
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Client Management
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'system:client-list' %}" class="btn btn-primary">
+                        Manage Clients
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

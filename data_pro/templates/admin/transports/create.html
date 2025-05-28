@@ -1,0 +1,119 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Create New Transport | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-truck"></i> Schedule New Transport
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:transport-list' %}">Transports</a></li>
+                    <li class="breadcrumb-item active">New</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" id="transport-form">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_customer" class="form-label">Customer</label>
+                                {{ form.customer }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_vehicle" class="form-label">Vehicle</label>
+                                {{ form.vehicle }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_pickup_location" class="form-label">Pickup Location</label>
+                                {{ form.pickup_location }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_dropoff_location" class="form-label">Dropoff Location</label>
+                                {{ form.dropoff_location }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_pickup_time" class="form-label">Pickup Date & Time</label>
+                                {{ form.pickup_time }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_price" class="form-label">Price (USD)</label>
+                                {{ form.price }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_notes" class="form-label">Special Instructions</label>
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:transport-list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Schedule Transport</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Pricing Information
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Standard Vehicle:</strong> $100 per trip</li>
+                        <li class="mb-2"><strong>VIP Vehicle:</strong> $200 per trip</li>
+                        <li class="mb-2"><strong>Airport Surcharge:</strong> +$50</li>
+                        <li class="mb-2"><strong>After Hours:</strong> +$30</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize datetime picker
+    $('#id_pickup_time').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm',
+        sideBySide: true
+    });
+
+    // Auto-calculate price based on vehicle type
+    $('#id_vehicle').change(function() {
+        const vehicleId = $(this).val();
+        if (vehicleId) {
+            $.getJSON(`/api/vehicles/${vehicleId}/`, function(data) {
+                let price = 100; // Standard default
+                if (data.vehicle_type === 'VIP') {
+                    price = 200;
+                }
+                $('#id_price').val(price);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

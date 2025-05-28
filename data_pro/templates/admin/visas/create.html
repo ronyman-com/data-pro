@@ -1,0 +1,125 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Create New Visa | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-passport"></i> Create New Visa
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:visa-list' %}">Visas</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_customer" class="form-label">Customer</label>
+                                {{ form.customer }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_passport" class="form-label">Passport</label>
+                                {{ form.passport }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_visa_type" class="form-label">Visa Type</label>
+                                {{ form.visa_type }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_visa_number" class="form-label">Visa Number</label>
+                                {{ form.visa_number }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_unit_cost" class="form-label">Cost (USD)</label>
+                                {{ form.unit_cost }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_issue_date" class="form-label">Issue Date</label>
+                                {{ form.issue_date }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_expiry_date" class="form-label">Expiry Date</label>
+                                {{ form.expiry_date }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_notes" class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:visa-list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Visa</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Visa Creation Guidelines
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Verify passport validity</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Check customer eligibility</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Confirm all documents are complete</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Double-check dates and numbers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize date pickers
+    $('#id_issue_date, #id_expiry_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
+    });
+    
+    // Dynamic passport selection based on customer
+    $('#id_customer').change(function() {
+        const customerId = $(this).val();
+        if (customerId) {
+            $.getJSON(`/api/customers/${customerId}/passports/`, function(data) {
+                const $passportSelect = $('#id_passport');
+                $passportSelect.empty();
+                $.each(data, function(index, passport) {
+                    $passportSelect.append(
+                        $('<option></option>').val(passport.id).text(passport.number)
+                    );
+                });
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Customers - Data-Pro Admin{% endblock %}
+{% block page_title %}Customer Management{% endblock %}
+
+{% block header_buttons %}
+    <div class="btn-group me-2">
+        <a href="{% url 'customer-create' %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Customer
+        </a>
+        <a href="{% url 'customer-import' %}" class="btn btn-sm btn-success" id="import-btn">
+            <i class="bi bi-upload"></i> Import
+        </a>
+        <a href="{% url 'customer-export' %}" class="btn btn-sm btn-secondary">
+            <i class="bi bi-download"></i> Export
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table id="customers-table" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Nationality</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>{{ customer.id }}</td>
+                <td>{{ customer.first_name }}</td>
+                <td>{{ customer.last_name }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.phone }}</td>
+                <td>{{ customer.nationality }}</td>
+                <td>{{ customer.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'customer-edit' customer.pk %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'customer-detail' customer.pk %}" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'customer-import' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Customers</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="excelFile" class="form-label">Select Excel File</label>
+                        <input class="form-control" type="file" id="excelFile" name="excel_file" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>Download the <a href="{% url 'customer-export' %}">template file</a> for reference.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#customers-table').DataTable({
+        responsive: true,
+        order: [[0, 'desc']]
+    });
+
+    $('#import-btn').click(function(e) {
+        e.preventDefault();
+        $('#importModal').modal('show');
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

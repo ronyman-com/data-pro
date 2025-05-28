@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Delete Transport | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-exclamation-triangle text-danger"></i> Delete Transport #{{ object.id }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:transport-list' %}">Transports</a></li>
+                    <li class="breadcrumb-item active">Delete</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-trash"></i> Confirm Deletion
+                </div>
+                <div class="card-body">
+                    <p class="lead">Are you sure you want to permanently delete this transport record?</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-octagon"></i> 
+                        <strong>Warning:</strong> This action cannot be undone. All related data will be permanently removed.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5>Transport Details</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Customer:</strong> {{ object.customer }}</li>
+                                <li><strong>Vehicle:</strong> {{ object.vehicle }}</li>
+                                <li><strong>Pickup:</strong> {{ object.pickup_location }} at {{ object.pickup_time|date:"M d, Y H:i" }}</li>
+                                <li><strong>Status:</strong> 
+                                    {% if object.is_completed %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:transport-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

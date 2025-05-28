@@ -1,0 +1,99 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Update Invoice Status | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-receipt"></i> Update Status for Invoice #{{ object.invoice_number }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:invoice-list' %}">Invoices</a></li>
+                    <li class="breadcrumb-item active">Status</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-credit-card"></i> Payment Status
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Current Status</label>
+                            <p class="form-control-plaintext">
+                                <span class="badge bg-{% if object.status == 'PAID' %}success{% elif object.status == 'OVERDUE' %}danger{% else %}warning{% endif %}">
+                                    {{ object.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_status" class="form-label">New Status</label>
+                            {{ form.status }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_paid_amount" class="form-label">Paid Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.paid_amount }}
+                            </div>
+                            <small class="form-text text-muted">Total amount: ${{ object.total_amount }}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_paid_date" class="form-label">Paid Date</label>
+                            {{ form.paid_date }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_payment_method" class="form-label">Payment Method</label>
+                            {{ form.payment_method }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_payment_notes" class="form-label">Payment Notes</label>
+                            {{ form.payment_notes }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:invoice-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize date picker
+    $('#id_paid_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
+    });
+    
+    // Auto-update paid amount when status changes to PAID
+    $('#id_status').change(function() {
+        if ($(this).val() === 'PAID') {
+            $('#id_paid_amount').val('{{ object.total_amount }}');
+        }
+    });
+});
+</script>
+{% endblock %}

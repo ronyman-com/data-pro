@@ -1,0 +1,73 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Visas - Data-Pro Admin{% endblock %}
+{% block page_title %}Visa Management{% endblock %}
+
+{% block header_buttons %}
+    <div class="btn-group me-2">
+        <a href="#" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Visa
+        </a>
+        <a href="#" class="btn btn-sm btn-success" id="import-btn">
+            <i class="bi bi-upload"></i> Import
+        </a>
+        <a href="#" class="btn btn-sm btn-secondary" id="export-btn">
+            <i class="bi bi-download"></i> Export
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table id="visas-table" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Visa No.</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Issue Date</th>
+                <th>Expiry Date</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visa in visas %}
+            <tr>
+                <td>{{ visa.visa_number }}</td>
+                <td>{{ visa.customer }}</td>
+                <td>{{ visa.get_visa_type_display }}</td>
+                <td>{{ visa.issue_date|date:"Y-m-d" }}</td>
+                <td>{{ visa.expiry_date|date:"Y-m-d" }}</td>
+                <td>${{ visa.unit_cost }}</td>
+                <td>
+                    <span class="badge bg-{% if visa.released_date %}success{% else %}warning{% endif %}">
+                        {% if visa.released_date %}Released{% else %}Processing{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#visas-table').DataTable({
+        responsive: true,
+        order: [[3, 'desc']]
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

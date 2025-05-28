@@ -1,0 +1,111 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Passports - Data-Pro Admin{% endblock %}
+{% block page_title %}Passport Management{% endblock %}
+
+{% block header_buttons %}
+    <div class="btn-group me-2">
+        <a href="#" class="btn btn-sm btn-primary" onclick="alert('Add passport functionality coming soon')">
+            <i class="bi bi-plus-circle"></i> Add Passport
+        </a>
+        <a href="#" class="btn btn-sm btn-success" id="import-btn">
+            <i class="bi bi-upload"></i> Import
+        </a>
+        <a href="#" class="btn btn-sm btn-secondary" id="export-btn">
+            <i class="bi bi-download"></i> Export
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table id="passports-table" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Passport No.</th>
+                <th>Customer</th>
+                <th>Issue Date</th>
+                <th>Expiry Date</th>
+                <th>Issuing Country</th>
+                <th>Service Cost</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for passport in passports %}
+            <tr>
+                <td>{{ passport.passport_number }}</td>
+                <td>{{ passport.customer }}</td>
+                <td>{{ passport.issue_date|date:"Y-m-d" }}</td>
+                <td>{{ passport.expiry_date|date:"Y-m-d" }}</td>
+                <td>{{ passport.issuing_country }}</td>
+                <td>${{ passport.service_cost_usd }}</td>
+                <td>
+                    <span class="badge bg-{% if passport.release_date %}success{% else %}warning{% endif %}">
+                        {% if passport.release_date %}Released{% else %}Processing{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="#" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Passports</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="passportExcelFile" class="form-label">Select Excel File</label>
+                        <input class="form-control" type="file" id="passportExcelFile" name="excel_file" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>Download the <a href="#">template file</a> for reference.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#passports-table').DataTable({
+        responsive: true,
+        order: [[2, 'desc']]
+    });
+
+    $('#import-btn').click(function(e) {
+        e.preventDefault();
+        $('#importModal').modal('show');
+    });
+
+    $('#export-btn').click(function(e) {
+        e.preventDefault();
+        window.location.href = "#"; // Replace with your export URL
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

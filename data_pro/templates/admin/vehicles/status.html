@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Update Vehicle Status | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-truck"></i> Update Status for {{ object.registration_number }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:vehicle-list' %}">Vehicles</a></li>
+                    <li class="breadcrumb-item active">Status</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-gear"></i> Vehicle Status
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Current Status</label>
+                            <p class="form-control-plaintext">
+                                {% if object.is_available %}
+                                    <span class="badge bg-success">Available</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Unavailable</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_is_available" class="form-label">New Status</label>
+                            <div class="form-check form-switch">
+                                {{ form.is_available }}
+                                <label class="form-check-label" for="id_is_available">
+                                    {% if object.is_available %}
+                                        Mark as unavailable
+                                    {% else %}
+                                        Mark as available
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_status_reason" class="form-label">Status Reason</label>
+                            {{ form.status_reason }}
+                            <small class="form-text text-muted">Explain reason for status change</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:vehicle-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

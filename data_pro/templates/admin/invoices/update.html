@@ -1,0 +1,193 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Update Invoice | Data-Pro Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-receipt"></i> Update Invoice #{{ object.invoice_number }}
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'system:invoice-list' %}">Invoices</a></li>
+                    <li class="breadcrumb-item active">Update</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" id="invoice-form">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer</label>
+                                <p class="form-control-plaintext">{{ object.customer }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_invoice_number" class="form-label">Invoice Number</label>
+                                {{ form.invoice_number }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_issue_date" class="form-label">Issue Date</label>
+                                {{ form.issue_date }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_due_date" class="form-label">Due Date</label>
+                                {{ form.due_date }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_status" class="form-label">Status</label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_notes" class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+
+                        <hr>
+
+                        <h5 class="mb-3">Invoice Items</h5>
+                        {{ invoice_item_formset.management_form }}
+                        <div id="invoice-items-container">
+                            {% for form in invoice_item_formset %}
+                            <div class="invoice-item-form row mb-3">
+                                <div class="col-md-5">
+                                    {{ form.description }}
+                                </div>
+                                <div class="col-md-2">
+                                    {{ form.quantity }}
+                                </div>
+                                <div class="col-md-2">
+                                    {{ form.unit_price }}
+                                </div>
+                                <div class="col-md-2">
+                                    {{ form.tax_rate }}
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-sm remove-item">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                {{ form.id }}
+                                {{ form.DELETE }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="button" id="add-item" class="btn btn-outline-primary btn-sm mb-3">
+                            <i class="bi bi-plus-circle"></i> Add Item
+                        </button>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'system:invoice-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Invoice</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-calculator"></i> Invoice Summary
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Subtotal</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" value="{{ object.total_amount }}" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Paid Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" value="{{ object.paid_amount }}" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Balance Due</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" 
+                                   value="{{ object.total_amount|subtract:object.paid_amount }}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-clock-history"></i> Invoice History
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Created:</strong> {{ object.created_at|date:"M d, Y H:i" }}</li>
+                        <li class="mb-2"><strong>Last Updated:</strong> {{ object.updated_at|date:"M d, Y H:i" }}</li>
+                        <li class="mb-2"><strong>Created By:</strong> {{ object.created_by }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize date pickers
+    $('#id_issue_date, #id_due_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
+    });
+
+    // Add new item form
+    $('#add-item').click(function() {
+        const formCount = $('#id_form-TOTAL_FORMS').val();
+        const newForm = $('.invoice-item-form').first().clone();
+        
+        newForm.find('input').val('');
+        newForm.find('select').val('');
+        newForm.find('.remove-item').prop('disabled', false);
+        
+        newForm.find(':input').each(function() {
+            const name = $(this).attr('name').replace('-0-', '-' + formCount + '-');
+            const id = $(this).attr('id').replace('-0-', '-' + formCount + '-');
+            $(this).attr({'name': name, 'id': id}).val('');
+        });
+        
+        $('#invoice-items-container').append(newForm);
+        $('#id_form-TOTAL_FORMS').val(parseInt(formCount) + 1);
+    });
+
+    // Remove item form
+    $(document).on('click', '.remove-item', function() {
+        const form = $(this).closest('.invoice-item-form');
+        const deleteInput = form.find('input[name$="-DELETE"]');
+        
+        if (deleteInput.length) {
+            deleteInput.val('1');
+            form.hide();
+        } else {
+            form.remove();
+        }
+    });
+});
+</script>
+{% endblock %}

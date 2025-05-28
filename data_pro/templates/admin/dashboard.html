@@ -1,0 +1,106 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Dashboard - Data-Pro Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Customers</h5>
+                <h2 class="card-text">{{ customer_count }}</h2>
+                <a href="{% url 'system:customer-list' %}" class="text-white">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Active Visas</h5>
+                <h2 class="card-text">0</h2>
+                <a href="{% url 'system:visa-list' %}" class="text-white">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Passports</h5>
+                <h2 class="card-text">0</h2>
+                <a href="{% url 'system:passport-list' %}" class="text-white">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending Invoices</h5>
+                <h2 class="card-text">0</h2>
+                <a href="{% url 'system:invoice-list' %}" class="text-dark">View All</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Recent Customers
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in recent_customers %}
+                        <tr>
+                            <td>{{ customer.first_name }} {{ customer.last_name }}</td>
+                            <td>{{ customer.email }}</td>
+                            <td>{{ customer.created_at|date:"M d" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Recent Invoices
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in recent_invoices %}
+                        <tr>
+                            <td>{{ invoice.invoice_number }}</td>
+                            <td>${{ invoice.total_amount }}</td>
+                            <td>
+                                <span class="badge bg-{% if invoice.status == 'PAID' %}success{% elif invoice.status == 'DRAFT' %}secondary{% else %}primary{% endif %}">
+                                    {{ invoice.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
