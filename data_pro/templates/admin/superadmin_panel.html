@@ -3,43 +3,52 @@
 
 {% block content %}
 <div class="container-fluid">
-    <h2>SuperAdmin Control Panel</h2>
+    <h1>Super Admin Control Panel</h1>
     
-    <div class="row mt-4">
+    <!-- System Statistics Cards -->
+    <div class="row">
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header">
-                    User Management
-                </div>
                 <div class="card-body">
-                    <a href="{% url 'system:customer-list' %}" class="btn btn-primary">
-                        Manage All Users
-                    </a>
+                    <h5 class="card-title">Active Clients</h5>
+                    <p class="display-4">{{ total_clients }}</p>
                 </div>
             </div>
         </div>
-        
-            <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                System Settings
-            </div>
-            
+        <!-- Add more stat cards -->
+    </div>
+    
+    <!-- Pending Approvals Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Pending Approvals</h3>
+        </div>
+        <div class="card-body">
+            <p>Visas: {{ pending_approvals.visas }}</p>
+            <p>Passport Extensions: {{ pending_approvals.extensions }}</p>
         </div>
     </div>
-        
-        <div class="col-md-4">
+</div>
+{% endblock %}
+
+<!-- templates/admin/system_settings.html -->
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>System Settings</h1>
+    
+    <div class="row">
+        {% for section in settings_sections %}
+        <div class="col-md-3">
             <div class="card">
-                <div class="card-header">
-                    Client Management
-                </div>
-                <div class="card-body">
-                    <a href="{% url 'system:client-list' %}" class="btn btn-primary">
-                        Manage Clients
-                    </a>
+                <div class="card-body text-center">
+                    <i class="bi {{ section.icon }} fs-1"></i>
+                    <h3>{{ section.name }}</h3>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

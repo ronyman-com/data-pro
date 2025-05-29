@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>Passport Extensions</h1>
+    <a href="{% url 'data_pro:passport-extension-create' %}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus"></i> New Extension Request
+    </a>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Passport</th>
+                        <th>Duration</th>
+                        <th>Cost</th>
+                        <th>Status</th>
+                        <th>Applied</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for extension in extensions %}
+                    <tr>
+                        <td>{{ extension.passport.passport_number }}</td>
+                        <td>{{ extension.get_duration_display }}</td>
+                        <td>${{ extension.cost }}</td>
+                        <td>
+                            {% if extension.is_completed %}
+                                <span class="badge badge-success">Completed</span>
+                            {% else %}
+                                <span class="badge badge-warning">In Process</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ extension.apply_date|date:"Y-m-d" }}</td>
+                        <td>
+                            <a href="{% url 'data_pro:passport-extension-detail' extension.pk %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if not extension.is_completed %}
+                                <a href="{% url 'data_pro:passport-extension-update' extension.pk %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if request.user.user_type == 'CLIENT_ADMIN' or request.user.is_superuser %}
+                                    <a href="{% url 'data_pro:passport-extension-complete' extension.pk %}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-check"></i> Complete
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No passport extensions found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

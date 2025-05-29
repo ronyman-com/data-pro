@@ -1,0 +1,33 @@
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.urls import reverse_lazy
+from ..models import Visa
+from ..forms import VisaForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class VisaListView(LoginRequiredMixin, ListView):
+    model = Visa
+    template_name = 'admin/visas/list.html'
+    context_object_name = 'visas'
+    paginate_by = 10
+
+class VisaCreateView(LoginRequiredMixin, CreateView):
+    model = Visa
+    form_class = VisaForm
+    template_name = 'admin/visas/create.html'
+    success_url = reverse_lazy('data_pro:visa-list')
+
+class VisaDetailView(LoginRequiredMixin, DetailView):
+    model = Visa
+    template_name = 'admin/visas/detail.html'
+    context_object_name = 'visa'
+
+class VisaUpdateView(LoginRequiredMixin, UpdateView):
+    model = Visa
+    form_class = VisaForm
+    template_name = 'admin/visas/update.html'
+    success_url = reverse_lazy('data_pro:visa-list')
+
+class VisaDeleteView(LoginRequiredMixin, DeleteView):
+    model = Visa
+    template_name = 'admin/visas/delete.html'
+    success_url = reverse_lazy('data_pro:visa-list')

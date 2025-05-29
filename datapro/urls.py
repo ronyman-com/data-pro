@@ -1,16 +1,31 @@
 from django.contrib import admin
+from django.conf import settings
 from django.urls import path, include
-from data_pro.admin.home import *
+from data_pro.system.home import *
 from django.views.generic import RedirectView
-from data_pro.admin.views import DashboardView
+from data_pro.system.views import *
 from django.conf.urls.static import static
-from data_pro.admin.views import *
-from data_pro.views import *
+from data_pro.system.views import *
+from data_pro.views.superuser import *
+
+superuser_patterns = [
+    path('', SuperAdminDashboardView.as_view(), name='dashboard'),
+    path('users/', UserListView.as_view(), name='user-list'),
+    path('users/create/', UserCreateView.as_view(), name='user-create'),
+    path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
+    path('users/<int:pk>/update/', UserUpdateView.as_view(), name='user-update'),
+    path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user-delete'),
+    path('clients/', ClientListView.as_view(), name='client-list'),
+    path('clients/create/', ClientCreateView.as_view(), name='client-create'),
+    path('clients/<int:pk>/update/', ClientUpdateView.as_view(), name='client-update'),
+    path('logs/', SystemLogsView.as_view(), name='system-logs'),
+    path('settings/', SystemSettingsView.as_view(), name='system-settings'),
+]
 
 urlpatterns = [
     path('system-admin/', admin.site.urls),
     path('', SystemLandingView.as_view(), name='home'),
-    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('dashboard/', SystemDashboardView.as_view(), name='dashboard'),
     path('superadmin/', SuperAdminPanelView.as_view(), name='SuperAdminPanelView'),
     path('system/settings/', SystemSettingsView.as_view(), name='system-settings'),
     
