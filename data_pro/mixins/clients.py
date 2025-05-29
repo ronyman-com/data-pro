@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from ..models import Client
+from data_pro.models.clients import *
+from django.urls import reverse_lazy
 
 class ClientAccessMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Mixin to ensure only authorized users can access client views"""

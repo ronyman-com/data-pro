@@ -70,7 +70,7 @@ DATABASES = {
 }
 
 # Custom User model
-# AUTH_USER_MODEL = 'data_pro.CustomUser'  # Updated to match your actual model name
+#AUTH_USER_MODEL = 'data_pro.CustomUser'  # Updated to match your actual model name
 
 
 # Authentication

@@ -6,7 +6,6 @@ from data_pro.views.customers import *
 from data_pro.views.invoices import *
 from data_pro.views.passports import *
 from data_pro.views.transports import *
-from data_pro.views.user import *
 from data_pro.views.vehicles import *
 from data_pro.views.visas import *
 from data_pro.system.views import *
@@ -71,11 +70,6 @@ urlpatterns = [
     # Passport Management
     path('passports/', PassportListView.as_view(), name='passport-list'),
 
-       # User
-    path('users/', UserListView.as_view(), name='user-list'),
-    path('users/create/', UserCreateView.as_view(), name='user-create'),
-    path('users/<int:pk>/edit/', UserUpdateView.as_view(), name='user-edit'),
-    path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user-delete'),
 
 
 

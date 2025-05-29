@@ -1,7 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from ..models import Vehicle
-from ..forms import VehicleForm
+from data_pro.models.vehicles import *
+from data_pro.forms.vehicles import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class VehicleListView(LoginRequiredMixin, ListView):

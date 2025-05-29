@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
 
 class SuperAdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Mixin to ensure only superusers can access the view"""

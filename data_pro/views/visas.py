@@ -1,7 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from ..models import Visa
-from ..forms import VisaForm
+from data_pro.models.visas import *
+from data_pro.forms.visas import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class VisaListView(LoginRequiredMixin, ListView):

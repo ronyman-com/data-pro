@@ -1,7 +1,7 @@
 # data_pro/management/commands/createclientuser.py
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from data_pro.models import Client
+from data_pro.models.models import Client
 
 class Command(BaseCommand):
     help = 'Creates a new client admin user'
