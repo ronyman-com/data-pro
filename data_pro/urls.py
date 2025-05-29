@@ -16,10 +16,9 @@ app_name = 'data_pro'
 
 urlpatterns = [
     # Authentication
-    path('auth/login/', CustomLoginView.as_view(), name='login'),
     
     # Dashboard
-    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('dashboard/', SystemDashboardView.as_view(), name='dashboard'),
     
     # Customer Management
     path('customers/', CustomerListView.as_view(), name='customer-list'),

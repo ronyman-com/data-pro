@@ -10,15 +10,11 @@ from data_pro.views.superuser import *
 
 superuser_patterns = [
     path('', SuperAdminDashboardView.as_view(), name='dashboard'),
-    path('users/', UserListView.as_view(), name='user-list'),
-    path('users/create/', UserCreateView.as_view(), name='user-create'),
-    path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
-    path('users/<int:pk>/update/', UserUpdateView.as_view(), name='user-update'),
-    path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user-delete'),
+   
     path('clients/', ClientListView.as_view(), name='client-list'),
     path('clients/create/', ClientCreateView.as_view(), name='client-create'),
     path('clients/<int:pk>/update/', ClientUpdateView.as_view(), name='client-update'),
-    path('logs/', SystemLogsView.as_view(), name='system-logs'),
+    #path('logs/', SystemLogsView.as_view(), name='system-logs'),
     path('settings/', SystemSettingsView.as_view(), name='system-settings'),
 ]
 

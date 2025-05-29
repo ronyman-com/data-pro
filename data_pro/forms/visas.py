@@ -1,5 +1,5 @@
 from django import forms
-from models.visas import Visa
+from data_pro.models.visas import Visa
 
 class VisaForm(forms.ModelForm):
     class Meta:

@@ -15,6 +15,8 @@ from .models.customers import Customer
 from .models.vehicles import Vehicle
 from .models.visas import Visa
 from .models.passports import Passport
+from django.contrib.admin.models import LogEntry
+from .models.superuser import AdminAuditLog
 
 User = get_user_model()
 
@@ -168,3 +170,10 @@ class PassportAdmin(admin.ModelAdmin):
     list_display = ('customer', 'passport_number', 'expiry_date')
     list_filter = ('expiry_date',)
     search_fields = ('passport_number', 'customer__first_name', 'customer__last_name')
+
+
+@admin.register(AdminAuditLog)
+class AdminAuditLogAdmin(admin.ModelAdmin):
+    list_display = ('admin', 'action_type', 'target_user', 'timestamp')
+    list_filter = ('action_type', 'timestamp')
+    search_fields = ('admin__username', 'target_user__username')

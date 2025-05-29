@@ -1,5 +1,5 @@
 from django import forms
-from models.transports import Transport
+from data_pro.models.transports import Transport
 
 class TransportForm(forms.ModelForm):
     class Meta:

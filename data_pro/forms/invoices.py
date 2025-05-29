@@ -1,5 +1,5 @@
 from django import forms
-from models.invoices import Invoice
+from data_pro.models.invoices import Invoice
 
 class InvoiceForm(forms.ModelForm):
     class Meta:

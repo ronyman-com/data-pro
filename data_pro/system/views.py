@@ -12,7 +12,8 @@ from data_pro.models.passports import  *
 from data_pro.models.invoices import  *
 from data_pro.models.vehicles import  *
 from data_pro.models.transports import  *
-from data_pro.models.user import *
+from data_pro.models.clients import  *
+
 
 class SuperAdminPanelView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     """Super Admin Control Panel View"""
@@ -28,7 +29,7 @@ class SuperAdminPanelView(LoginRequiredMixin, UserPassesTestMixin, TemplateView)
         # System-wide statistics
         context.update({
             'total_clients': Client.objects.filter(is_active=True).count(),
-            'system_users': CustomUser.objects.count(),
+            'system_users': Client.objects.count(),
             'active_customers': Customer.objects.filter(is_active=True).count(),
             'revenue_this_month': Invoice.objects.filter(
                 issue_date__month=today.month,

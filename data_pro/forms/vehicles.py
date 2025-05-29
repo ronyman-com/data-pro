@@ -1,5 +1,5 @@
 from django import forms
-from models.vehicles import Vehicle
+from data_pro.models.vehicles import Vehicle
 
 class VehicleForm(forms.ModelForm):
     class Meta:

@@ -12,7 +12,6 @@ from data_pro.models.passports import *
 from data_pro.models.invoices import *
 from data_pro.models.vehicles import *
 from data_pro.models.transports import *
-from data_pro.models.user import *
 from data_pro.system.views import *
 
 
@@ -35,7 +34,7 @@ class SuperAdminDashboardView(SuperAdminRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'total_users': CustomUser.objects.count(),
+            'total_users': Client.objects.count(),
             'active_clients': Client.objects.filter(is_active=True).count(),
             'recent_activity': SystemLog.objects.all().order_by('-timestamp')[:10],
         })
@@ -84,22 +83,22 @@ class ClientUpdateView(SuperAdminRequiredMixin, UpdateView):
         )
         return response
 
-class SystemLogsView(SuperAdminRequiredMixin, ListView):
-    """View system activity logs"""
-    model = SystemLog
-    template_name = 'admin/superuser/system_logs.html'
-    context_object_name = 'logs'
-    paginate_by = 50
+#class SystemLogsView(SuperAdminRequiredMixin, ListView):
+   # """View system activity logs"""
+   # model = SystemLog
+    #template_name = 'admin/superuser/system_logs.html'
+   #context_object_name = 'logs'
+    #paginate_by = 50
     
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    ##def get_queryset(self):
+       # queryset = super().get_queryset()
         
         # Filter by log type if specified
-        log_type = self.request.GET.get('type')
-        if log_type:
-            queryset = queryset.filter(log_type=log_type)
+       # log_type = self.request.GET.get('type')
+        #if log_type:
+           # queryset = queryset.filter(log_type=log_type)
             
-        return queryset.select_related('user').order_by('-timestamp')
+        #return queryset.select_related('user').order_by('-timestamp')
 
 class SystemSettingsView(SuperAdminRequiredMixin, TemplateView):
     """System configuration view"""

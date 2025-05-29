@@ -1,5 +1,5 @@
 from django import forms
-from models.clients import Client
+from data_pro.models.clients import Client
 
 class ClientForm(forms.ModelForm):
     class Meta:
