@@ -9,8 +9,32 @@ from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 import csv
 import io
+
+
+@login_required
+def create_customer(request):
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            customer = form.save(commit=False)
+            if not customer.user:
+                customer.user = request.user
+            customer.save()
+            return redirect('customer_list')
+    else:
+        form = CustomerForm()
+    
+    return render(request, 'customers/create.html', {'form': form})
+
+@login_required
+def customer_list(request):
+    customers = Customer.objects.all()
+    return render(request, 'customers/list.html', {'customers': customers})
 
 class CustomerListView(LoginRequiredMixin, ListView):
     model = Customer

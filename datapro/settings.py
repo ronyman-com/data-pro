@@ -17,14 +17,14 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'data_pro.apps.DataProConfig',  # MUST come before auth
-    'django.contrib.auth',          # Now this will see your CustomUser
+    'django.contrib.auth', 
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     'crispy_forms',
+    'data_pro',
 ]
 
 MIDDLEWARE = [
@@ -52,8 +52,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'data_pro.context_processors.user_type',
+                'django.contrib.messages.context_processors.messages'
             ],
         },
     },
@@ -69,16 +68,12 @@ DATABASES = {
     }
 }
 
-# Custom User model
-#AUTH_USER_MODEL = 'data_pro.CustomUser'  # Updated to match your actual model name
 
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-
 
 
 

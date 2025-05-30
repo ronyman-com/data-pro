@@ -138,10 +138,12 @@ class AdminNotification(models.Model):
     )
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # THIS IS WHERE THE CORRECTED FIELD GOES:
     recipients = models.ManyToManyField(
         User,
         related_name='admin_notifications',
-        limit_choices_to={'user_type__in': ['SUPERADMIN', 'CLIENT_ADMIN']}
+        limit_choices_to={'groups__name__in': ['SuperAdmin', 'ClientAdmin']}
     )
 
     class Meta:

@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
+from django.conf import settings
 
 # Import models directly
 from data_pro.models.customers import Customer
@@ -20,8 +21,11 @@ class SystemLandingView(LoginRequiredMixin, TemplateView):
         user = self.request.user
         today = timezone.now().date()
 
+        # Safely check user_type with fallback
+        user_type = getattr(user, 'user_type', None)
+        
         # Get filtered querysets based on user type
-        if user.user_type == 'SUPERADMIN':
+        if user_type == 'admin':  # Now using the safely accessed user_type
             customers = Customer.objects.all()
             visas = Visa.objects.all()
             passports = Passport.objects.all()
@@ -29,12 +33,17 @@ class SystemLandingView(LoginRequiredMixin, TemplateView):
             vehicles = Vehicle.objects.all()
             transports = Transport.objects.all()
         else:
-            customers = Customer.objects.filter(client=user.client)
-            visas = Visa.objects.filter(customer__client=user.client)
-            passports = Passport.objects.filter(customer__client=user.client)
-            extensions = PassportExtension.objects.filter(passport__customer__client=user.client)
-            vehicles = Vehicle.objects.filter(client=user.client)
-            transports = Transport.objects.filter(client=user.client)
+            # Add additional safety check for client attribute
+            client_filter = {}
+            if hasattr(user, 'client'):
+                client_filter = {'client': user.client}
+            
+            customers = Customer.objects.filter(**client_filter)
+            visas = Visa.objects.filter(customer__client=user.client) if hasattr(user, 'client') else Visa.objects.none()
+            passports = Passport.objects.filter(customer__client=user.client) if hasattr(user, 'client') else Passport.objects.none()
+            extensions = PassportExtension.objects.filter(passport__customer__client=user.client) if hasattr(user, 'client') else PassportExtension.objects.none()
+            vehicles = Vehicle.objects.filter(**client_filter)
+            transports = Transport.objects.filter(**client_filter)
 
         # Prepare dashboard statistics
         context.update({
@@ -47,12 +56,12 @@ class SystemLandingView(LoginRequiredMixin, TemplateView):
                 status__in=['scheduled', 'in_progress']
             ).count(),
             'recent_invoices': Invoice.objects.filter(
-                client=user.client if hasattr(user, 'client') else None
-            ).order_by('-issue_date')[:5],
+                **client_filter
+            ).order_by('-issue_date')[:5] if hasattr(user, 'client') else Invoice.objects.none(),
         })
 
         # Prepare quick actions
-        context['quick_actions'] = self._get_quick_actions(user, passports.exists())
+        context['quick_actions'] = self._get_quick_actions(user, passports.exists() if passports else False)
 
         return context
 
@@ -65,8 +74,8 @@ class SystemLandingView(LoginRequiredMixin, TemplateView):
             {'name': 'Schedule Transport', 'url': 'data_pro:transport-create', 'icon': 'bi-truck'},
         ]
 
-        # Add admin-only actions
-        if user.user_type == 'SUPERADMIN':
+        # Add admin-only actions (using getattr for safety)
+        if getattr(user, 'user_type', None) == 'admin':
             actions.extend([
                 {'name': 'Add Client', 'url': 'data_pro:client-create', 'icon': 'bi-building'},
                 {'name': 'Register Vehicle', 'url': 'data_pro:vehicle-create', 'icon': 'bi-car-front'},

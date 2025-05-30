@@ -20,7 +20,7 @@ class SuperAdminPanelView(LoginRequiredMixin, UserPassesTestMixin, TemplateView)
     template_name = 'admin/superadmin_panel.html'
     
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.user_type == 'SUPERADMIN'
+        return self.request.user.is_superuser or self.request.user.user_type == 'admin'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -53,7 +53,7 @@ class SystemSettingsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'admin/system_settings.html'
     
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.user_type == 'SUPERADMIN'
+        return self.request.user.is_superuser or self.request.user.user_type == 'admin'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,7 +77,7 @@ class SystemDashboardView(LoginRequiredMixin, TemplateView):
 
         # Base filter for client-specific data
         client_filter = {}
-        if not (user.is_superuser or user.user_type == 'SUPERADMIN'):
+        if not (user.is_superuser or user.user_type == 'admin'):
             client_filter = {'client': user.client}
 
         # Get counts for all metrics
@@ -118,7 +118,7 @@ class PassportExtensionListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not (self.request.user.is_superuser or self.request.user.user_type == 'SUPERADMIN'):
+        if not (self.request.user.is_superuser or self.request.user.user_type == 'admin'):
             queryset = queryset.filter(
                 passport__customer__client=self.request.user.client
             )
@@ -138,7 +138,7 @@ class TransportListView(LoginRequiredMixin, ListView):
         if status != 'all':
             queryset = queryset.filter(status=status)
         
-        if not (self.request.user.is_superuser or self.request.user.user_type == 'SUPERADMIN'):
+        if not (self.request.user.is_superuser or self.request.user.user_type == 'admin'):
             queryset = queryset.filter(client=self.request.user.client)
             
         return queryset.select_related('vehicle', 'customer')
@@ -168,5 +168,23 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 client=client,
                 status__in=['scheduled', 'in_progress']
             ).count(),
+        })
+        return context
+    
+
+class SystemLandingView(LoginRequiredMixin, TemplateView):
+    """System dashboard view showing key metrics and quick actions"""
+    template_name = 'admin/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        today = timezone.now().date()
+        
+        # Add your context data here
+        context.update({
+            'current_date': today,
+            'user': user,
+            # Add other context variables as needed
         })
         return context

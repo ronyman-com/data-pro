@@ -12,3 +12,5 @@ class CustomerForm(forms.ModelForm):
             'status': forms.Select(choices=Customer.STATUS_CHOICES),
             'client': forms.Select(attrs={'class': 'form-control'}),
         }
+
+

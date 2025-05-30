@@ -8,14 +8,16 @@ from django.utils.translation import gettext_lazy as _
 from django.shortcuts import render
 
 # Import models
-from data_pro.models.clients import Client
-from data_pro.models.customers import Customer
-from data_pro.models.visas import Visa
-from data_pro.models.passports import Passport
-from data_pro.models.invoices import Invoice
-from data_pro.models.vehicles import Vehicle
-from data_pro.models.transports import TransportService
-from data_pro.models.AdminAuditLog import AdminAuditLog
+from data_pro.models.clients import *
+from data_pro.models.customers import *
+from data_pro.models.visas import *
+from data_pro.models.passports import *
+from data_pro.models.invoices import *
+from data_pro.models.vehicles import *
+from data_pro.models.transports import *
+from data_pro.models.AdminAuditLog import *
+
+
 
 class CustomAdminSite(admin.AdminSite):
     site_header = 'Data-Pro Administration'
@@ -56,82 +58,120 @@ admin_site = CustomAdminSite(name='system_admin')
 class ClientInline(admin.StackedInline):
     model = Client
     can_delete = False
-    verbose_name_plural = 'Client Profile'
-    fields = ('company_name', 'contact_person', 'email', 'phone', 'status')
-    extra = 0
+    verbose_name_plural = 'Client Account'
+    fields = ('user_type', 'company_name', 'contact_person', 'email', 'phone', 'status')
+
+# data_pro/admin.py
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+from data_pro.models import *
+
+class ClientInline(admin.StackedInline):
+    model = Client
+    can_delete = False
+    verbose_name_plural = _('Client Account')
+    fields = (
+        'user_type',
+        'status',
+        'company_name',
+        'contact_person',
+        'email',
+        'phone'
+    )
 
 class CustomerInline(admin.StackedInline):
     model = Customer
     extra = 0
-    verbose_name_plural = 'Customer Profiles'
-    fields = ('first_name', 'last_name', 'email', 'phone', 'status')
+    verbose_name_plural = _('Customer Accounts')
+    fields = (
+        'status',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'client'
+    )
 
 class CustomUserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_client_profile')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
-    search_fields = ('username', 'email', 'first_name', 'last_name')
-    
-    fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-        }),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    list_display = (
+        'username',
+        'email',
+        'get_user_type',
+        'get_client_status',
+        'is_staff',
+        'get_client_account'
     )
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
     
-    def get_client_profile(self, obj):
-        if hasattr(obj, 'client_profile'):
-            url = reverse('system_admin:data_pro_client_change', args=[obj.client_profile.id])
-            return format_html('<a href="{}">{}</a>', url, obj.client_profile.company_name)
+    def get_user_type(self, obj):
+        if hasattr(obj, 'client_account'):
+            return obj.client_account.get_user_type_display()
+        return _("N/A")
+    get_user_type.short_description = _('User Type')
+    
+    def get_client_status(self, obj):
+        if hasattr(obj, 'client_account'):
+            return obj.client_account.get_status_display()
+        return _("N/A")
+    get_client_status.short_description = _('Client Status')
+    
+    def get_client_account(self, obj):
+        if hasattr(obj, 'client_account'):
+            url = reverse('admin:data_pro_client_change', args=[obj.client_account.id])
+            return format_html(
+                '<a href="{}">{}</a>',
+                url,
+                obj.client_account.company_name
+            )
         return "-"
-    get_client_profile.short_description = 'Client Profile'
+    get_client_account.short_description = _('Client Organization')
 
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return []
-        return [ClientInline(self.model, self.admin_site), CustomerInline(self.model, self.admin_site)]
+        return super().get_inline_instances(request, obj)
 
-@admin.register(Client, site=admin_site)
+@admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('company_name', 'contact_person', 'email', 'phone', 'status', 'created_at')
-    list_filter = ('status', 'created_at')
-    search_fields = ('company_name', 'contact_person', 'email', 'phone')
-    raw_id_fields = ('user',)
-    
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('user', 'company_name', 'contact_person')
-        }),
-        ('Contact Information', {
-            'fields': ('email', 'phone')
-        }),
-        ('Status', {
-            'fields': ('status',),
-            'classes': ('collapse',)
-        }),
+    list_display = (
+        'company_name',
+        'user',
+        'get_user_type_display',
+        'get_status_display',
+        'email',
+        'phone'
     )
+    list_filter = ('user_type', 'status')
+    search_fields = ('company_name', 'contact_person', 'email', 'phone')
 
-@admin.register(Customer, site=admin_site)
+@admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'phone', 'client', 'status')
+    list_display = (
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'get_status_display',
+        'client_link'
+    )
     list_filter = ('status', 'client')
     search_fields = ('first_name', 'last_name', 'email', 'phone')
-    raw_id_fields = ('user', 'client')
     
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('first_name', 'last_name', 'email', 'phone')
-        }),
-        ('Organization', {
-            'fields': ('client', 'user')
-        }),
-        ('Status', {
-            'fields': ('status',),
-            'classes': ('collapse',)
-        }),
-    )
+    def client_link(self, obj):
+        url = reverse('admin:data_pro_client_change', args=[obj.client.id])
+        return format_html(
+            '<a href="{}">{}</a>',
+            url,
+            obj.client.company_name
+        )
+    client_link.short_description = _('Client Organization')
 
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)
 @admin.register(Invoice, site=admin_site)
 class InvoiceAdmin(admin.ModelAdmin):
     list_display = ('invoice_number', 'customer_link', 'amount', 'issue_date')
@@ -179,15 +219,6 @@ class PassportAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, f"{obj.customer.first_name} {obj.customer.last_name}")
     customer_link.short_description = 'Customer'
 
-@admin.register(AdminAuditLog, site=admin_site)
-class AdminAuditLogAdmin(admin.ModelAdmin):
-    list_display = ('admin_user', 'action', 'timestamp')
-    list_filter = ('action', 'timestamp')
-    search_fields = ('admin__username', 'action')
-    
-    def admin_user(self, obj):
-        return obj.admin.username if obj.admin else '-'
-    admin_user.short_description = 'Admin User'
 
 @admin.register(Group, site=admin_site)
 class GroupAdmin(admin.ModelAdmin):

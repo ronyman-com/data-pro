@@ -10,6 +10,8 @@ from data_pro.models.invoices import  *
 from data_pro.models.vehicles import  *
 from data_pro.models.transports import  *
 from data_pro.models.user import *
+from django.contrib.auth import get_user_model
+User = get_user_model()  # Use Django
 
 
 # User Signals

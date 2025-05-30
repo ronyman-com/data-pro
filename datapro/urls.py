@@ -26,7 +26,7 @@ urlpatterns = [
     path('system/settings/', SystemSettingsView.as_view(), name='system-settings'),
     
     # Redirect /system/ to /system/dashboard/
-    #path('system/', RedirectView.as_view(url='dashboard/', permanent=True)),
+    path('system/', RedirectView.as_view(url='dashboard/', permanent=True)),
     
     # Include your app URLs with namespace
     path('system/', include(('data_pro.urls'), namespace='system')),
