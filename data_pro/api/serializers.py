@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from data_pro.core.models import Customer, Visa, Passport, Invoice, Vehicle, TransportService
+from data_pro.models.clients import *
+from data_pro.models.invoices import *
+from data_pro.models.transports import *
+from data_pro.models.customers import *
+from data_pro.models.vehicles import *
+from data_pro.models.visas import *
+from data_pro.models.passports import *
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:

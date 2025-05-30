@@ -8,8 +8,35 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from data_pro.models.passports import *
 from data_pro.forms.passports import *
+from django.views.generic import ListView
+from django.http import JsonResponse
 
-# ... (Keep all existing passport views) ...
+
+class PassportListView(ListView):
+    model = Passport
+    paginate_by = 20  # Adjust as needed
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Add any filtering here if needed
+        return queryset
+
+    def render_to_response(self, context, **response_kwargs):
+        passports = context['object_list']
+        data = [{
+            'id': passport.id,
+            'passport_number': passport.passport_number,
+            'expiry_date': passport.expiry_date.strftime('%Y-%m-%d') if passport.expiry_date else None,
+            'status': passport.status
+            # Add other fields as needed
+        } for passport in passports]
+        
+        return JsonResponse({
+            'passports': data,
+            'count': context['paginator'].count,
+            'page': context['page_obj'].number,
+            'total_pages': context['paginator'].num_pages
+        })
 
 class PassportExtensionListView(LoginRequiredMixin, ListView):
     model = PassportExtension

@@ -1,21 +1,20 @@
-
-# data_pro/api/urls.py
-from django.urls import path, include
+# data_pro/api/customer_urls.py
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r'customers', views.CustomerViewSet)
-router.register(r'visas', views.VisaViewSet)
-router.register(r'passports', views.PassportViewSet)
-router.register(r'invoices', views.InvoiceViewSet)
-router.register(r'vehicles', views.VehicleViewSet)
-router.register(r'transports', views.TransportServiceViewSet)
+router.register(r'', views.CustomerViewSet, basename='customers')
 
-
-
+# Custom endpoints for customer-related actions
 urlpatterns = [
-    path('', include(router.urls)),
-    # Only include this once in your project:
-    path('auth/', include('rest_framework.urls', namespace='drf_auth'))
-]
+    # CSV Import/Export (now handled as ViewSet actions)
+    path('import_csv/', views.CustomerViewSet.as_view({'post': 'import_csv'}), name='customer-import-csv'),
+    path('export_csv/', views.CustomerViewSet.as_view({'get': 'export_csv'}), name='customer-export-csv'),
+    
+    # Status management (now handled by BaseViewSet)
+    path('<int:pk>/status/', views.CustomerViewSet.as_view({'post': 'status'}), name='customer-status'),
+    
+    # Additional customer endpoints can be added here
+    path('<int:pk>/verify/', views.CustomerViewSet.as_view({'post': 'verify'}), name='customer-verify'),
+] + router.urls

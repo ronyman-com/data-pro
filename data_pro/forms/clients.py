@@ -4,7 +4,10 @@ from data_pro.models.clients import Client
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = ['company_name', 'contact_person', 'email', 'phone', 'address', 'status']
+        fields = ['company_name', 'contact_person', 'email', 'phone', 'status']
+        # Remove 'address' if it's not in your model
+        # Or add it to your model if you need it
+        
         widgets = {
-            'address': forms.Textarea(attrs={'rows': 3}),
+            'status': forms.Select(choices=Client.STATUS_CHOICES),
         }
