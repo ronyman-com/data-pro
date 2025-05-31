@@ -5,25 +5,44 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 
+
 class Customer(models.Model):
-    client = models.ForeignKey('Client', on_delete=models.CASCADE)
+    CUSTOMER_TYPE_CHOICES = (
+        ('individual', _('Individual')),
+        ('organization', _('Organization')),
+    )
+
     STATUS_CHOICES = (
         ('active', _('Active')),
         ('inactive', _('Inactive')),
         ('pending', _('Pending')),
     )
-    
+
     client = models.ForeignKey(
-        'data_pro.Client',  # Changed from 'clients.Client'
+        'data_pro.Client',
         on_delete=models.CASCADE,
-        related_name='customers'
+        related_name='customers',
+        verbose_name=_('Client Organization')
     )
-
-
-    first_name = models.CharField(_('First Name'), max_length=50)
-    last_name = models.CharField(_('Last Name'), max_length=50)
-    email = models.EmailField(_('Email'))
+    customer_type = models.CharField(
+        _('Customer Type'),
+        max_length=20,
+        choices=CUSTOMER_TYPE_CHOICES,
+        default='individual'
+    )
+    office = models.ForeignKey(
+        'data_pro.Office',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('Office (for organizations)')
+    )
+    first_name = models.CharField(_('First Name'), max_length=50, blank=True, null=True)
+    last_name = models.CharField(_('Last Name'), max_length=50, blank=True, null=True)
+    organization_name = models.CharField(_('Organization Name'), max_length=100, blank=True, null=True)
+    email = models.EmailField(_('Email'), blank=True, null=True)
     phone = models.CharField(_('Phone'), max_length=20)
+    nationality = models.CharField(_('Nationality'), max_length=100, blank=True, null=True)
     status = models.CharField(
         _('Status'),
         max_length=10,
@@ -35,15 +54,30 @@ class Customer(models.Model):
 
     def clean(self):
         errors = {}
-        if not self.client_id:
-            errors['client'] = _('Customer must be associated with a client')
-        if not self.office_id:
-            errors['office'] = _('Customer must be associated with an office')
+        
+        # Validate based on customer type
+        if self.customer_type == 'individual':
+            if not self.first_name:
+                errors['first_name'] = _('First name is required for individuals')
+            if not self.last_name:
+                errors['last_name'] = _('Last name is required for individuals')
+        else:  # organization
+            if not self.organization_name:
+                errors['organization_name'] = _('Organization name is required')
+            if not self.office:
+                errors['office'] = _('Office is required for organizations')
+        
         if errors:
             raise ValidationError(errors)
 
+    @property
+    def name(self):
+        if self.customer_type == 'individual':
+            return f"{self.first_name} {self.last_name}"
+        return self.organization_name
+
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.name
 
     class Meta:
         verbose_name = _('Customer')

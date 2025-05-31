@@ -46,6 +46,15 @@ class CustomerCreateView(LoginRequiredMixin, CreateView):
     template_name = 'admin/customers/create.html'
     success_url = reverse_lazy('data_pro:customer-list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.client = self.request.user.client
+        return super().form_valid(form)
+
     def form_valid(self, form):
         # Get the user's profile
         user_profile = self.request.user.profile

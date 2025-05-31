@@ -11,8 +11,8 @@
             </h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'system:customer-list' %}">Customers</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'data_pro:dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'data_pro:customer-list' %}">Customers</a></li>
                     <li class="breadcrumb-item active">Create</li>
                 </ol>
             </nav>
@@ -23,17 +23,37 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" novalidate>
                         {% csrf_token %}
                         
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="id_first_name" class="form-label">First Name</label>
-                                {{ form.first_name }}
+                        <div class="mb-3">
+                            <label for="id_customer_type" class="form-label">Customer Type*</label>
+                            {{ form.customer_type }}
+                        </div>
+
+                        <!-- Individual Fields -->
+                        <div id="individual-fields">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="id_first_name" class="form-label">First Name*</label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_last_name" class="form-label">Last Name*</label>
+                                    {{ form.last_name }}
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label for="id_last_name" class="form-label">Last Name</label>
-                                {{ form.last_name }}
+                        </div>
+
+                        <!-- Organization Fields -->
+                        <div id="organization-fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="id_organization_name" class="form-label">Organization Name*</label>
+                                {{ form.organization_name }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_office" class="form-label">Office*</label>
+                                {{ form.office }}
                             </div>
                         </div>
 
@@ -43,36 +63,33 @@
                                 {{ form.email }}
                             </div>
                             <div class="col-md-6">
-                                <label for="id_phone" class="form-label">Phone</label>
+                                <label for="id_phone" class="form-label">Phone*</label>
                                 {{ form.phone }}
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="id_address" class="form-label">Address</label>
-                            {{ form.address }}
+                            <label for="id_nationality" class="form-label">Nationality</label>
+                            {{ form.nationality }}
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="id_date_of_birth" class="form-label">Date of Birth</label>
-                                {{ form.date_of_birth }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="id_nationality" class="form-label">Nationality</label>
-                                {{ form.nationality }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_passports" class="form-label">Associated Passports</label>
+                            {{ form.passports }}
                         </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'system:customer-list' %}" class="btn btn-secondary">Cancel</a>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'data_pro:customer-list' %}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Create Customer</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        
+    </div>
+</div>
+
+    
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-info text-white">
@@ -92,14 +109,48 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+
 <script>
 $(document).ready(function() {
     // Initialize date picker
-    $('#id_date_of_birth').datepicker({
-        format: 'yyyy-mm-dd',
-        autoclose: true,
-        endDate: '0d'
+    $('#id_date_of_birth').flatpickr({
+        dateFormat: 'Y-m-d',
+        maxDate: 'today'
+    });
+    
+    // Add required field indicators
+    $('label[for="id_first_name"], label[for="id_last_name"], label[for="id_phone"]')
+        .append('<span class="text-danger"> *</span>');
+});
+</script>
+{% block extra_js %}
+<script>
+function toggleCustomerFields(customerType) {
+    const individualFields = document.getElementById('individual-fields');
+    const organizationFields = document.getElementById('organization-fields');
+    
+    if (customerType === 'individual') {
+        individualFields.style.display = 'block';
+        organizationFields.style.display = 'none';
+    } else {
+        individualFields.style.display = 'none';
+        organizationFields.style.display = 'block';
+    }
+}
+
+$(document).ready(function() {
+    // Initialize with correct fields visible
+    toggleCustomerFields($('#id_customer_type').val());
+    
+    // Initialize select2 for better multi-select
+    $('#id_passports').select2({
+        placeholder: "Select passports",
+        allowClear: true
+    });
+    
+    // Initialize nationality select
+    $('#id_nationality').select2({
+        placeholder: "Select nationality"
     });
 });
 </script>

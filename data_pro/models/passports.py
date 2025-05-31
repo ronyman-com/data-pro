@@ -7,6 +7,12 @@ from django.utils.translation import gettext_lazy as _
 User = get_user_model()
 
 class Passport(models.Model):
+    customer = models.ForeignKey(
+        'Customer',
+        on_delete=models.CASCADE,
+        related_name='passports',
+        verbose_name=_('Customer')
+    )
     STATUS_CHOICES = (
         ('valid', 'Valid'),
         ('expired', 'Expired'),
