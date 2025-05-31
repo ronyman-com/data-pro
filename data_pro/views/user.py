@@ -4,7 +4,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from data_pro.forms.users import UserForm
+from data_pro.forms.user import UserForm
 
 User = get_user_model()
 
@@ -25,12 +25,21 @@ class UserCreateView(CreateView):
     form_class = UserCreateForm  # Use the creation form
     template_name = 'admin/user/create.html'
     success_url = reverse_lazy('data_pro:user-list')
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
 class UserUpdateView(UpdateView):
     model = User
     form_class = UserForm  # Use the update form
     template_name = 'admin/user/update.html'
     success_url = reverse_lazy('data_pro:user-list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
 class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = User

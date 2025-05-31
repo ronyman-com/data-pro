@@ -11,8 +11,8 @@
             </h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'system:home' %}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'system:visa-list' %}">Visas</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'data_pro:dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'data_pro:visa-list' %}">Visas</a></li>
                     <li class="breadcrumb-item active">Create</li>
                 </ol>
             </nav>
@@ -69,7 +69,7 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'system:visa-list' %}" class="btn btn-secondary">Cancel</a>
+                            <a href="{% url 'data_pro:visa-list' %}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Create Visa</button>
                         </div>
                     </form>
@@ -100,9 +100,9 @@
 <script>
 $(document).ready(function() {
     // Initialize date pickers
-    $('#id_issue_date, #id_expiry_date').datepicker({
-        format: 'yyyy-mm-dd',
-        autoclose: true
+    $('#id_issue_date, #id_expiry_date').flatpickr({
+        dateFormat: 'Y-m-d',
+        allowInput: true
     });
     
     // Dynamic passport selection based on customer
@@ -112,14 +112,24 @@ $(document).ready(function() {
             $.getJSON(`/api/customers/${customerId}/passports/`, function(data) {
                 const $passportSelect = $('#id_passport');
                 $passportSelect.empty();
+                $passportSelect.append($('<option>').val('').text('Select Passport'));
                 $.each(data, function(index, passport) {
                     $passportSelect.append(
-                        $('<option></option>').val(passport.id).text(passport.number)
+                        $('<option></option>').val(passport.id).text(passport.passport_number)
                     );
                 });
+            }).fail(function() {
+                console.error('Error loading passports');
             });
+        } else {
+            $('#id_passport').empty().append($('<option>').val('').text('Select Customer First'));
         }
     });
+    
+    // Trigger change event if customer is already selected
+    if ($('#id_customer').val()) {
+        $('#id_customer').trigger('change');
+    }
 });
 </script>
 {% endblock %}

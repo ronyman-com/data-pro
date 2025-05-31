@@ -79,6 +79,7 @@ AUTHENTICATION_BACKENDS = [
 
 
 
+
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = 'data_pro:dashboard'  # Updated to match your URL namespace
 LOGOUT_REDIRECT_URL = '/auth/login/'

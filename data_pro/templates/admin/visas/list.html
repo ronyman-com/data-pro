@@ -5,10 +5,10 @@
 
 {% block header_buttons %}
     <div class="btn-group me-2">
-        <a href="#" class="btn btn-sm btn-primary">
+        <a href="{% url 'data_pro:visa-create' %}" class="btn btn-sm btn-primary">
             <i class="bi bi-plus-circle"></i> Add Visa
         </a>
-        <a href="#" class="btn btn-sm btn-success" id="import-btn">
+        <a href="#" class="btn btn-sm btn-success" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">
             <i class="bi bi-upload"></i> Import
         </a>
         <a href="#" class="btn btn-sm btn-secondary" id="export-btn">
@@ -42,15 +42,15 @@
                 <td>{{ visa.expiry_date|date:"Y-m-d" }}</td>
                 <td>${{ visa.unit_cost }}</td>
                 <td>
-                    <span class="badge bg-{% if visa.released_date %}success{% else %}warning{% endif %}">
-                        {% if visa.released_date %}Released{% else %}Processing{% endif %}
+                    <span class="badge bg-{% if visa.status == 'released' %}success{% elif visa.status == 'expired' %}danger{% else %}warning{% endif %}">
+                        {{ visa.get_status_display }}
                     </span>
                 </td>
                 <td>
-                    <a href="#" class="btn btn-sm btn-warning">
+                    <a href="{% url 'data_pro:visa-update' pk=visa.id %}" class="btn btn-sm btn-warning">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="#" class="btn btn-sm btn-info">
+                    <a href="{% url 'data_pro:visa-detail' pk=visa.id %}" class="btn btn-sm btn-info">
                         <i class="bi bi-eye"></i>
                     </a>
                 </td>
@@ -60,12 +60,48 @@
     </table>
 </div>
 
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'data_pro:visa-import' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Visas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="visaExcelFile" class="form-label">Select Excel File</label>
+                        <input class="form-control" type="file" id="visaExcelFile" name="excel_file" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>Download the <a href="{% url 'data_pro:visa-template' %}">template file</a> for reference.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% block extra_js %}
 <script>
 $(document).ready(function() {
     $('#visas-table').DataTable({
         responsive: true,
-        order: [[3, 'desc']]
+        order: [[3, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: [7] } // Disable sorting for actions column
+        ]
+    });
+
+    $('#export-btn').click(function(e) {
+        e.preventDefault();
+        window.location.href = "{% url 'data_pro:visa-export' %}";
     });
 });
 </script>

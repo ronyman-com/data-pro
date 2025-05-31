@@ -44,9 +44,12 @@ urlpatterns = [
     # Visa Management
     path('visas/', VisaListView.as_view(), name='visa-list'),
     path('visas/create/', VisaCreateView.as_view(), name='visa-create'),
+    path('visas/<int:pk>/', VisaDetailView.as_view(), name='visa-detail'),
     path('visas/<int:pk>/update/', VisaUpdateView.as_view(), name='visa-update'),
-    path('visas/<int:pk>/status/', VisaStatusView.as_view(), name='visa-status'),
     path('visas/<int:pk>/delete/', VisaDeleteView.as_view(), name='visa-delete'),
+    path('visas/export/', visa_export, name='visa-export'),
+    path('visas/import/', visa_import, name='visa-import'),
+    path('visas/template/', visa_template, name='visa-template'),
 
     # Transport Management
     path('transports/', TransportListView.as_view(), name='transport-list'),

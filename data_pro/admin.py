@@ -18,9 +18,6 @@ from data_pro.models.transports import *
 from data_pro.models.AdminAuditLog import *
 from data_pro.models.office import *
 
-
-
-
 class CustomAdminSite(admin.AdminSite):
     site_header = 'Data-Pro Administration'
     site_title = 'Data-Pro Admin Portal'
@@ -56,21 +53,6 @@ class CustomAdminSite(admin.AdminSite):
         return render(request, 'admin/activity_log.html', context)
 
 admin_site = CustomAdminSite(name='system_admin')
-
-class ClientInline(admin.StackedInline):
-    model = Client
-    can_delete = False
-    verbose_name_plural = 'Client Account'
-    fields = ('user_type', 'company_name', 'contact_person', 'email', 'phone', 'status')
-
-# data_pro/admin.py
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
-from data_pro.models import *
 
 class ClientInline(admin.StackedInline):
     model = Client
@@ -137,7 +119,7 @@ class CustomUserAdmin(BaseUserAdmin):
             return []
         return super().get_inline_instances(request, obj)
 
-@admin.register(Client)
+@admin.register(Client, site=admin_site)
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('company_name', 'contact_person', 'email', 'status', 'is_verified')
     list_filter = ('status', 'is_verified', 'country')
@@ -162,28 +144,43 @@ class ClientAdmin(admin.ModelAdmin):
         }),
     )
 
-@admin.register(Customer)
+@admin.register(Customer, site=admin_site)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = (
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-        'get_status_display',
-        'client_link'
-    )
-    list_filter = ('status', 'client')
+    list_display = ('full_name', 'email', 'phone', 'client', 'status', 'created_at')
+    list_filter = ('status', 'client', 'created_at')
     search_fields = ('first_name', 'last_name', 'email', 'phone')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'client')
+        }),
+        ('Personal Information', {
+            'fields': ('first_name', 'last_name', 'email', 'phone')
+        }),
+        ('Status', {
+            'fields': ('status',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
     
-    def client_link(self, obj):
-        url = reverse('admin:data_pro_client_change', args=[obj.client.id])
-        return format_html(
-            '<a href="{}">{}</a>',
-            url,
-            obj.client.company_name
-        )
-    client_link.short_description = _('Client Organization')
-
+    def full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+    full_name.short_description = 'Full Name'
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(client=request.user.client)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "client" and not request.user.is_superuser:
+            kwargs["queryset"] = Client.objects.filter(id=request.user.client.id)
+            kwargs["initial"] = request.user.client
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 @admin.register(Invoice, site=admin_site)
 class InvoiceAdmin(admin.ModelAdmin):
@@ -214,8 +211,9 @@ class VehicleAdmin(admin.ModelAdmin):
 
 @admin.register(Visa, site=admin_site)
 class VisaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer_link', 'country')
-    search_fields = ('country', 'customer__first_name')
+    list_display = ('visa_number', 'customer_link', 'issuing_country', 'status', 'expiry_date')
+    list_filter = ('status', 'issuing_country')
+    search_fields = ('visa_number', 'customer__first_name', 'customer__last_name', 'issuing_country')
     
     def customer_link(self, obj):
         url = reverse('system_admin:data_pro_customer_change', args=[obj.customer.id])
@@ -224,14 +222,13 @@ class VisaAdmin(admin.ModelAdmin):
 
 @admin.register(Passport, site=admin_site)
 class PassportAdmin(admin.ModelAdmin):
-    list_display = ('passport_number', 'customer_link', 'expiry_date')
-    search_fields = ('passport_number', 'customer__first_name')
+    list_display = ('passport_number', 'customer_link', 'issuing_country', 'expiry_date')
+    search_fields = ('passport_number', 'customer__first_name', 'customer__last_name')
     
     def customer_link(self, obj):
         url = reverse('system_admin:data_pro_customer_change', args=[obj.customer.id])
         return format_html('<a href="{}">{}</a>', url, f"{obj.customer.first_name} {obj.customer.last_name}")
     customer_link.short_description = 'Customer'
-
 
 @admin.register(Group, site=admin_site)
 class GroupAdmin(admin.ModelAdmin):
@@ -239,62 +236,16 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     filter_horizontal = ('permissions',)
 
+@admin.register(Office, site=admin_site)
+class OfficeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'email', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('name', 'email', 'phone')
+    ordering = ('name',)
+
 # Unregister and re-register User with our custom admin
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 
 admin.site = admin_site
 admin.sites.site = admin_site
-
-
-
-
-
-@admin.register(Customer)
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'phone', 'client', 'status', 'created_at')
-    list_filter = ('status', 'client', 'created_at')
-    search_fields = ('first_name', 'last_name', 'email', 'phone')
-    readonly_fields = ('created_at', 'updated_at')
-    fieldsets = (
-        (None, {
-            'fields': ('user', 'client')
-        }),
-        ('Personal Information', {
-            'fields': ('first_name', 'last_name', 'email', 'phone')
-        }),
-        ('Status', {
-            'fields': ('status',)
-        }),
-        ('Metadata', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    def full_name(self, obj):
-        return str(obj)
-    full_name.short_description = 'Full Name'
-    
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(client=request.user.client)
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "client" and not request.user.is_superuser:
-            kwargs["queryset"] = Client.objects.filter(id=request.user.client.id)
-            kwargs["initial"] = request.user.client
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-
-
-
-@admin.register(Office)
-class OfficeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'email', 'is_active')
-    list_filter = ('is_active',)
-    search_fields = ('name', 'email', 'phone')
-    ordering = ('name',)
