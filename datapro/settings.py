@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'data_pro',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -68,7 +69,8 @@ DATABASES = {
     }
 }
 
-
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Authentication
 AUTHENTICATION_BACKENDS = [

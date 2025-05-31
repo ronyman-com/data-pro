@@ -1,4 +1,4 @@
-<!-- templates/admin/base.html -->
+{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +19,7 @@
         }
         .sidebar {
             min-height: 100vh;
+            position: relative;
         }
         :root {
             --primary: #4b38b3;
@@ -34,6 +35,31 @@
         .module h2, .module caption, .inline-group h2 {
             background: var(--primary);
         }
+        .brand-logo {
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 4px;
+        }
+        .copyright {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #adb5bd;
+            font-size: 0.8rem;
+            padding: 0 15px;
+        }
+        .copyright a {
+            color: #adb5bd;
+            text-decoration: none;
+        }
+        .copyright a:hover {
+            color: white;
+            text-decoration: underline;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -43,7 +69,7 @@
             <!-- Sidebar -->
             <div class="col-md-2 d-none d-md-block bg-dark sidebar">
                 <div class="sidebar-sticky pt-3">
-                    <h4 class="text-white px-3">Data-Pro Admin</h4>
+                    <img src="/static/brand/data_pro_logo.jpg" alt="Data Pro Logo" class="brand-logo">
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{% url 'data_pro:dashboard' %}">
@@ -57,7 +83,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{% url 'data_pro:visa-list' %}">
-                                <i class="bi bi-passport"></i> Visas
+                                <i class="bi bi-file-earmark-text"></i> Visas
                             </a>
                         </li>
                         <li class="nav-item">
@@ -91,12 +117,19 @@
                         
                         {% if request.user.is_authenticated %}
                         <li class="nav-item mt-4">
-                            <a class="nav-link text-white" href="{% url 'logout' %}">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link text-white bg-transparent border-0 w-100 text-start">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </form>
                         </li>
                         {% endif %}
                     </ul>
+                    
+                    <div class="copyright">
+                        &copy; {% now "Y" %} <strong>Data Pro</strong> powered by <a href="https://uniqueegde.net" target="_blank">Unique Edge</a>
+                    </div>
                 </div>
             </div>
 

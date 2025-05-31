@@ -16,6 +16,8 @@ from data_pro.models.invoices import *
 from data_pro.models.vehicles import *
 from data_pro.models.transports import *
 from data_pro.models.AdminAuditLog import *
+from data_pro.models.office import *
+
 
 
 
@@ -137,16 +139,28 @@ class CustomUserAdmin(BaseUserAdmin):
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = (
-        'company_name',
-        'user',
-        'get_user_type_display',
-        'get_status_display',
-        'email',
-        'phone'
-    )
-    list_filter = ('user_type', 'status')
+    list_display = ('company_name', 'contact_person', 'email', 'status', 'is_verified')
+    list_filter = ('status', 'is_verified', 'country')
     search_fields = ('company_name', 'contact_person', 'email', 'phone')
+    readonly_fields = ('created_at', 'updated_at', 'full_address')
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'status', 'is_verified')
+        }),
+        ('Company Information', {
+            'fields': ('company_name', 'company_reg_number', 'tax_id')
+        }),
+        ('Contact Information', {
+            'fields': ('contact_person', 'email', 'phone', 'alternate_phone', 'website')
+        }),
+        ('Address Information', {
+            'fields': ('address_line1', 'address_line2', 'city', 'state', 'postal_code', 'country')
+        }),
+        ('Metadata', {
+            'fields': ('notes', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -170,8 +184,7 @@ class CustomerAdmin(admin.ModelAdmin):
         )
     client_link.short_description = _('Client Organization')
 
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
+
 @admin.register(Invoice, site=admin_site)
 class InvoiceAdmin(admin.ModelAdmin):
     list_display = ('invoice_number', 'customer_link', 'amount', 'issue_date')
@@ -232,3 +245,56 @@ admin.site.register(User, CustomUserAdmin)
 
 admin.site = admin_site
 admin.sites.site = admin_site
+
+
+
+
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'email', 'phone', 'client', 'status', 'created_at')
+    list_filter = ('status', 'client', 'created_at')
+    search_fields = ('first_name', 'last_name', 'email', 'phone')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'client')
+        }),
+        ('Personal Information', {
+            'fields': ('first_name', 'last_name', 'email', 'phone')
+        }),
+        ('Status', {
+            'fields': ('status',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def full_name(self, obj):
+        return str(obj)
+    full_name.short_description = 'Full Name'
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(client=request.user.client)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "client" and not request.user.is_superuser:
+            kwargs["queryset"] = Client.objects.filter(id=request.user.client.id)
+            kwargs["initial"] = request.user.client
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+
+
+
+@admin.register(Office)
+class OfficeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'email', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('name', 'email', 'phone')
+    ordering = ('name',)

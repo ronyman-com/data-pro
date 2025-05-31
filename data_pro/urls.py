@@ -12,6 +12,8 @@ from data_pro.system.views import *
 
 
 
+
+
 app_name = 'data_pro'
 
 urlpatterns = [
@@ -19,6 +21,8 @@ urlpatterns = [
     
     # Dashboard
     path('dashboard/', SystemDashboardView.as_view(), name='dashboard'),
+    # urls.py
+    path('client/quick-create/', ClientQuickCreateView.as_view(), name='client-quick-create'),
     
     # Customer Management
     path('customers/', CustomerListView.as_view(), name='customer-list'),
@@ -78,4 +82,10 @@ urlpatterns = [
     path('passport-extensions/<int:pk>/', PassportExtensionDetailView.as_view(), name='passport-extension-detail'),
     path('passport-extensions/<int:pk>/update/', PassportExtensionUpdateView.as_view(), name='passport-extension-update'),
     path('passport-extensions/<int:pk>/complete/', PassportExtensionCompleteView.as_view(), name='passport-extension-complete'),
+    path('customers/<int:customer_id>/passports/create/', PassportCreateView.as_view(), name='passport-create'),
+    path('passports/<int:pk>/update/', PassportUpdateView.as_view(), name='passport-update'),
+    path('passports/<int:pk>/delete/', PassportDeleteView.as_view(), name='passport-delete'),
+    path('passports/<int:pk>/status/', PassportStatusView.as_view(), name='passport-status'),
+    
+
 ]

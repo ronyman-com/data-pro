@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q, Count, Sum
+from django.http import JsonResponse
 
 # Import models
 from data_pro.models.customers import  *
@@ -188,3 +189,18 @@ class SystemLandingView(LoginRequiredMixin, TemplateView):
             # Add other context variables as needed
         })
         return context
+    
+# views.py
+class ClientQuickCreateView(LoginRequiredMixin, CreateView):
+    model = Client
+    fields = ['company_name']
+    template_name = 'admin/clients/quick_create.html'
+
+    def form_valid(self, form):
+        client = form.save(commit=False)
+        client.status = 'active'
+        client.save()
+        return JsonResponse({
+            'id': client.id,
+            'text': str(client)
+        })
